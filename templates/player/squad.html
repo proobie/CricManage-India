@@ -1,0 +1,44 @@
+{% extends "base.html" %}
+{% block title %}Squad • Player Portal • CricManage India{% endblock %}
+
+{% block content %}
+  <div class="flex flex-wrap items-end justify-between gap-3">
+    <div>
+      <div class="text-sm font-semibold text-cricket-gold">Squad View</div>
+      <h1 class="mt-1 text-3xl font-bold">Club Teammates</h1>
+      <p class="mt-2 text-sm text-slate-300">View names and specialties of all club players.</p>
+    </div>
+    <a class="rounded-xl bg-white/10 px-4 py-2.5 text-sm hover:bg-white/15" href="{{ url_for('player_dashboard') }}">Back</a>
+  </div>
+
+  <div class="mt-6 overflow-hidden rounded-2xl border border-white/10">
+    <div class="overflow-x-auto">
+      <table class="min-w-full text-left text-sm">
+        <thead class="bg-white/5 text-xs uppercase text-slate-300">
+          <tr>
+            <th class="px-4 py-3">Jersey</th>
+            <th class="px-4 py-3">Name</th>
+            <th class="px-4 py-3">Role</th>
+            <th class="px-4 py-3">Specialty</th>
+          </tr>
+        </thead>
+        <tbody class="divide-y divide-white/10 bg-slate-950/20">
+          {% for p in players %}
+            <tr class="hover:bg-white/5">
+              <td class="px-4 py-3 font-semibold">#{{ p.jersey_number }}</td>
+              <td class="px-4 py-3">{{ p.name }}</td>
+              <td class="px-4 py-3">{{ p.role_group }}</td>
+              <td class="px-4 py-3 text-slate-300">{{ p.specialty or '—' }}</td>
+            </tr>
+          {% endfor %}
+          {% if not players %}
+            <tr>
+              <td class="px-4 py-6 text-slate-300" colspan="4">No players yet.</td>
+            </tr>
+          {% endif %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+{% endblock %}
+

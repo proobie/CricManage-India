@@ -1,0 +1,135 @@
+{% extends "base.html" %}
+{% if player %}
+  {% set page_title = "Edit Player" %}
+{% else %}
+  {% set page_title = "Add Player" %}
+{% endif %}
+{% block title %}{{ page_title }} • Admin • CricManage India{% endblock %}
+
+{% block content %}
+  <div class="flex flex-wrap items-end justify-between gap-3">
+    <div>
+      <div class="text-sm font-semibold text-cricket-gold">Squad Management</div>
+      <h1 class="mt-1 text-3xl font-bold">{{ page_title }}</h1>
+      <p class="mt-2 text-sm text-slate-300">Store role, specialty, jersey number, and player bio.</p>
+    </div>
+    <a class="rounded-xl bg-white/10 px-4 py-2.5 text-sm hover:bg-white/15" href="{{ url_for('admin_players') }}">Back</a>
+  </div>
+
+  <div class="mt-6 grid gap-4 md:grid-cols-3">
+    <div class="md:col-span-2 rounded-2xl border border-white/10 bg-white/5 p-6">
+      <form method="post" class="grid gap-4 md:grid-cols-2">
+        <div class="md:col-span-2">
+          <label class="text-sm font-semibold">Full Name</label>
+          <input
+            name="name"
+            value="{{ player.name if player else '' }}"
+            class="mt-1 w-full rounded-xl border border-white/10 bg-slate-950/60 px-3 py-2 text-sm outline-none focus:border-cricket-gold/60"
+            required
+          />
+        </div>
+
+        <div>
+          <label class="text-sm font-semibold">Role (Indian squad)</label>
+          <select
+            name="role_group"
+            class="mt-1 w-full rounded-xl border border-white/10 bg-slate-950/60 px-3 py-2 text-sm outline-none focus:border-cricket-gold/60"
+            required
+          >
+            {% set rg = player.role_group if player else '' %}
+            <option value="" {% if not rg %}selected{% endif %}>Select role</option>
+            {% for opt in ["Openers","Middle Order","Spinners","Pacers","Wicket-keeper"] %}
+              <option value="{{ opt }}" {% if rg == opt %}selected{% endif %}>{{ opt }}</option>
+            {% endfor %}
+          </select>
+        </div>
+
+        <div>
+          <label class="text-sm font-semibold">Jersey Number</label>
+          <input
+            name="jersey_number"
+            value="{{ player.jersey_number if player else '' }}"
+            type="number"
+            class="mt-1 w-full rounded-xl border border-white/10 bg-slate-950/60 px-3 py-2 text-sm outline-none focus:border-cricket-gold/60"
+            required
+          />
+        </div>
+
+        <div class="md:col-span-2">
+          <label class="text-sm font-semibold">Specialty</label>
+          <input
+            name="specialty"
+            value="{{ player.specialty if player else '' }}"
+            class="mt-1 w-full rounded-xl border border-white/10 bg-slate-950/60 px-3 py-2 text-sm outline-none focus:border-cricket-gold/60"
+            placeholder="Right-arm Off-break, Left-hand Bat, Keeper..."
+          />
+        </div>
+
+        <div class="md:col-span-2">
+          <label class="text-sm font-semibold">Bio</label>
+          <textarea
+            name="bio"
+            rows="4"
+            class="mt-1 w-full rounded-xl border border-white/10 bg-slate-950/60 px-3 py-2 text-sm outline-none focus:border-cricket-gold/60"
+            placeholder="Brief player description..."
+          >{{ player.bio if player and player.bio else '' }}</textarea>
+        </div>
+
+        <div class="md:col-span-2 flex flex-wrap items-center justify-between gap-2">
+          <button
+            class="rounded-xl bg-cricket-gold px-4 py-2.5 text-sm font-semibold text-slate-900 hover:brightness-110"
+            type="submit"
+          >
+            Save
+          </button>
+          {% if player %}
+            <form method="post" action="{{ url_for('admin_players_delete', player_id=player.id) }}">
+              <button class="rounded-xl bg-red-500/20 px-4 py-2.5 text-sm font-semibold text-red-100 hover:bg-red-500/30" type="submit">
+                Delete Player
+              </button>
+            </form>
+          {% endif %}
+        </div>
+      </form>
+    </div>
+
+    {% if player %}
+      <div class="rounded-2xl border border-white/10 bg-white/5 p-6">
+        <div class="text-sm font-semibold">Player Portal Login</div>
+        <p class="mt-1 text-sm text-slate-300">Create a login for this player (one-time).</p>
+
+        <form class="mt-4 space-y-3" method="post" action="{{ url_for('admin_create_player_login', player_id=player.id) }}">
+          <div>
+            <label class="text-sm font-semibold">Username</label>
+            <input
+              name="username"
+              class="mt-1 w-full rounded-xl border border-white/10 bg-slate-950/60 px-3 py-2 text-sm outline-none focus:border-cricket-gold/60"
+              placeholder="e.g. rohit45"
+              required
+            />
+          </div>
+          <div>
+            <label class="text-sm font-semibold">Temporary Password</label>
+            <input
+              type="password"
+              name="password"
+              class="mt-1 w-full rounded-xl border border-white/10 bg-slate-950/60 px-3 py-2 text-sm outline-none focus:border-cricket-gold/60"
+              required
+            />
+          </div>
+          <button class="w-full rounded-xl bg-white/10 px-4 py-2.5 text-sm font-semibold hover:bg-white/15" type="submit">
+            Create Player Login
+          </button>
+        </form>
+      </div>
+    {% else %}
+      <div class="rounded-2xl border border-white/10 bg-white/5 p-6">
+        <div class="text-sm font-semibold">Tip</div>
+        <p class="mt-1 text-sm text-slate-300">
+          After you add the player, open Edit to create their Player Portal login.
+        </p>
+      </div>
+    {% endif %}
+  </div>
+{% endblock %}
+

@@ -1,0 +1,58 @@
+{% extends "base.html" %}
+{% block title %}Squad • Admin • CricManage India{% endblock %}
+
+{% block content %}
+  <div class="flex flex-wrap items-end justify-between gap-3">
+    <div>
+      <div class="text-sm font-semibold text-cricket-gold">Squad Management</div>
+      <h1 class="mt-1 text-3xl font-bold">Players</h1>
+      <p class="mt-2 text-sm text-slate-300">Register players with Indian cricket roles and specialties.</p>
+    </div>
+    <a class="rounded-xl bg-cricket-gold px-4 py-2.5 text-sm font-semibold text-slate-900 hover:brightness-110" href="{{ url_for('admin_players_new') }}">+ Add Player</a>
+  </div>
+
+  <form class="mt-6 flex gap-2" method="get">
+    <input
+      name="q"
+      value="{{ q }}"
+      class="w-full rounded-xl border border-white/10 bg-slate-950/60 px-3 py-2 text-sm outline-none focus:border-cricket-gold/60"
+      placeholder="Search by name..."
+    />
+    <button class="rounded-xl bg-white/10 px-4 py-2 text-sm hover:bg-white/15" type="submit">Search</button>
+  </form>
+
+  <div class="mt-4 overflow-hidden rounded-2xl border border-white/10">
+    <div class="overflow-x-auto">
+      <table class="min-w-full text-left text-xs sm:text-sm">
+        <thead class="bg-white/5 text-xs uppercase text-slate-300">
+          <tr>
+            <th class="px-3 py-3 sm:px-4">Jersey</th>
+            <th class="px-3 py-3 sm:px-4">Name</th>
+            <th class="px-3 py-3 sm:px-4">Role</th>
+            <th class="px-3 py-3 sm:px-4">Specialty</th>
+            <th class="px-3 py-3 sm:px-4"></th>
+          </tr>
+        </thead>
+        <tbody class="divide-y divide-white/10 bg-slate-950/20">
+          {% for p in players %}
+            <tr class="hover:bg-white/5">
+              <td class="px-3 py-3 font-semibold sm:px-4">#{{ p.jersey_number }}</td>
+              <td class="px-3 py-3 sm:px-4">{{ p.name }}</td>
+              <td class="px-3 py-3 sm:px-4">{{ p.role_group }}</td>
+              <td class="px-3 py-3 text-slate-300 sm:px-4">{{ p.specialty or '—' }}</td>
+              <td class="px-3 py-3 text-right sm:px-4">
+                <a class="rounded-lg bg-white/10 px-3 py-1.5 text-xs hover:bg-white/15" href="{{ url_for('admin_players_edit', player_id=p.id) }}">Edit</a>
+              </td>
+            </tr>
+          {% endfor %}
+          {% if not players %}
+            <tr>
+              <td class="px-4 py-6 text-slate-300" colspan="5">No players yet.</td>
+            </tr>
+          {% endif %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+{% endblock %}
+

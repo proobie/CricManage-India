@@ -1,0 +1,133 @@
+{% extends "base.html" %}
+{% block title %}Player Portal • CricManage India{% endblock %}
+
+{% block content %}
+  <div class="flex flex-wrap items-end justify-between gap-3">
+    <div>
+      <div class="text-sm font-semibold text-cricket-gold">Player Portal</div>
+      <h1 class="mt-1 text-3xl font-bold">{{ player.name }}</h1>
+      <p class="mt-2 text-sm text-slate-300">
+        #{{ player.jersey_number }} • {{ player.role_group }} • {{ player.specialty or '—' }}
+      </p>
+    </div>
+    <a class="rounded-xl bg-white/10 px-4 py-2.5 text-sm hover:bg-white/15" href="{{ url_for('player_squad') }}">View Squad</a>
+  </div>
+
+  {% if next_match %}
+    <div class="mt-6 rounded-2xl border {% if in_xi %}border-emerald-500/30 bg-emerald-500/10{% else %}border-white/10 bg-white/5{% endif %} p-5">
+      <div class="flex flex-wrap items-start justify-between gap-3">
+        <div>
+          <div class="text-sm font-semibold">Lineup Reminder</div>
+          <div class="mt-1 text-lg font-bold">{{ next_match.opponent_team }}</div>
+          <div class="mt-1 text-sm text-slate-300">
+            {{ next_match.match_type }} • {{ next_match.venue }} • {{ next_match.date_time.strftime('%d %b %Y, %I:%M %p') }}
+          </div>
+        </div>
+        <div class="rounded-xl border border-white/10 bg-slate-950/30 px-4 py-3">
+          {% if in_xi %}
+            <div class="text-xs uppercase text-emerald-200">Status</div>
+            <div class="mt-1 font-bold text-emerald-100">You are in the Starting XI</div>
+          {% else %}
+            <div class="text-xs uppercase text-slate-300">Status</div>
+            <div class="mt-1 font-bold">Not in XI (yet)</div>
+            <div class="mt-1 text-xs text-slate-400">Selection updates when coach saves Playing XI.</div>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+  {% endif %}
+
+  <div class="mt-6 grid gap-4 md:grid-cols-3">
+    <div class="rounded-2xl border border-white/10 bg-white/5 p-5">
+      <div class="text-sm font-semibold">Career Totals</div>
+      <div class="mt-4 grid gap-3">
+        <div class="rounded-xl border border-white/10 bg-slate-950/30 p-4">
+          <div class="text-xs uppercase text-slate-400">Runs</div>
+          <div class="mt-1 text-2xl font-bold text-cricket-gold">{{ career_runs }}</div>
+        </div>
+        <div class="rounded-xl border border-white/10 bg-slate-950/30 p-4">
+          <div class="text-xs uppercase text-slate-400">Wickets</div>
+          <div class="mt-1 text-2xl font-bold text-cricket-gold">{{ career_wkts }}</div>
+        </div>
+        <div class="rounded-xl border border-white/10 bg-slate-950/30 p-4">
+          <div class="text-xs uppercase text-slate-400">Matches Logged</div>
+          <div class="mt-1 text-2xl font-bold">{{ stats|length }}</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="md:col-span-2 rounded-2xl border border-white/10 bg-white/5 p-5">
+      <div class="flex flex-wrap items-end justify-between gap-3">
+        <div>
+          <div class="text-sm font-semibold">Performance Analytics</div>
+          <div class="mt-1 text-sm text-slate-300">Runs per match and wickets per match (completed fixtures).</div>
+        </div>
+      </div>
+
+      {% if stats|length == 0 %}
+        <div class="mt-4 text-sm text-slate-300">No completed match stats yet.</div>
+      {% else %}
+        <div class="mt-4 grid gap-4 md:grid-cols-2">
+          <div class="rounded-xl border border-white/10 bg-slate-950/30 p-4">
+            <div class="text-xs uppercase text-slate-400">Runs per match</div>
+            <canvas id="runsChart" height="160"></canvas>
+          </div>
+          <div class="rounded-xl border border-white/10 bg-slate-950/30 p-4">
+            <div class="text-xs uppercase text-slate-400">Wickets per match</div>
+            <canvas id="wktsChart" height="160"></canvas>
+          </div>
+        </div>
+      {% endif %}
+    </div>
+  </div>
+
+  {% if stats|length > 0 %}
+    <script>
+      const labels = {{ stats|map(attribute='match_id')|list|tojson }};
+      const runs = {{ stats|map(attribute='runs_scored')|list|tojson }};
+      const wkts = {{ stats|map(attribute='wickets_taken')|list|tojson }};
+
+      const common = {
+        responsive: true,
+        plugins: {
+          legend: { display: false },
+          tooltip: { enabled: true },
+        },
+        scales: {
+          x: { ticks: { color: "#cbd5e1" }, grid: { color: "rgba(255,255,255,0.06)" } },
+          y: { ticks: { color: "#cbd5e1" }, grid: { color: "rgba(255,255,255,0.06)" } },
+        },
+      };
+
+      new Chart(document.getElementById("runsChart"), {
+        type: "line",
+        data: {
+          labels,
+          datasets: [{
+            data: runs,
+            borderColor: "#fbbf24",
+            backgroundColor: "rgba(251,191,36,0.15)",
+            tension: 0.35,
+            fill: true,
+          }],
+        },
+        options: common,
+      });
+
+      new Chart(document.getElementById("wktsChart"), {
+        type: "bar",
+        data: {
+          labels,
+          datasets: [{
+            data: wkts,
+            backgroundColor: "rgba(6,78,59,0.9)",
+            borderColor: "#fbbf24",
+            borderWidth: 1,
+          }],
+        },
+        options: common,
+      });
+    </script>
+  {% endif %}
+{% endblock %}
+

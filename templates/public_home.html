@@ -1,0 +1,49 @@
+{% extends "base.html" %}
+{% block title %}CricManage India{% endblock %}
+
+{% block content %}
+  <div class="grid gap-6 md:grid-cols-2">
+    <div class="rounded-2xl border border-white/10 bg-white/5 p-6">
+      <div class="inline-flex items-center gap-2 rounded-full bg-cricket-green/30 px-3 py-1 text-xs font-semibold text-cricket-gold">
+        🇮🇳 Indian Cricket Club Management
+      </div>
+      <h1 class="mt-4 text-3xl font-bold leading-tight">
+        Digitize squad, fixtures, Playing XI, and match-by-match stats.
+      </h1>
+      <p class="mt-3 text-slate-300">
+        CricManage India provides an Admin Portal for coaches/managers and a Player Portal
+        with career totals, form trends, and lineup reminders.
+      </p>
+      <div class="mt-5 flex flex-wrap gap-3">
+        <a
+          href="{{ url_for('login') }}"
+          class="rounded-xl bg-cricket-gold px-4 py-2.5 text-sm font-semibold text-slate-900 hover:brightness-110"
+        >
+          Login
+        </a>
+        <div class="rounded-xl border border-white/10 bg-white/5 px-4 py-2.5 text-sm text-slate-200">
+          Demo Admin: <span class="font-semibold">admin</span> / <span class="font-semibold">admin123</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="rounded-2xl border border-white/10 bg-gradient-to-br from-cricket-green/40 to-slate-950 p-6">
+      <h2 class="text-xl font-bold">What’s inside</h2>
+      <div class="mt-4 grid gap-3">
+        <div class="rounded-xl border border-white/10 bg-white/5 p-4">
+          <div class="text-sm font-semibold">Admin Portal</div>
+          <div class="mt-1 text-sm text-slate-300">
+            Squad roles (Openers/Middle Order/Spinners/Pacers/Keeper), fixture scheduling, Playing XI builder, scorecard entry.
+          </div>
+        </div>
+        <div class="rounded-xl border border-white/10 bg-white/5 p-4">
+          <div class="text-sm font-semibold">Player Portal</div>
+          <div class="mt-1 text-sm text-slate-300">
+            Career totals + charts for runs/wickets per match, upcoming XI reminder, and full squad view.
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+{% endblock %}
+

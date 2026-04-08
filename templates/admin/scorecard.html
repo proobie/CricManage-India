@@ -1,0 +1,103 @@
+{% extends "base.html" %}
+{% block title %}Scorecard • Admin • CricManage India{% endblock %}
+
+{% block content %}
+  <div class="flex flex-wrap items-end justify-between gap-3">
+    <div>
+      <div class="text-sm font-semibold text-cricket-gold">Post-Match Analysis</div>
+      <h1 class="mt-1 text-3xl font-bold">Scorecard Entry</h1>
+      <p class="mt-2 text-sm text-slate-300">
+        {{ fixture.opponent_team }} • {{ fixture.match_type }} • {{ fixture.venue }}
+      </p>
+    </div>
+    <a class="rounded-xl bg-white/10 px-4 py-2.5 text-sm hover:bg-white/15" href="{{ url_for('admin_fixtures') }}">Back</a>
+  </div>
+
+  {% if not players %}
+    <div class="mt-6 rounded-2xl border border-white/10 bg-white/5 p-6">
+      <div class="text-sm text-slate-300">
+        No Playing XI set yet. Please select the XI first.
+      </div>
+      <a class="mt-4 inline-block rounded-xl bg-cricket-gold px-4 py-2.5 text-sm font-semibold text-slate-900 hover:brightness-110" href="{{ url_for('admin_fixture_playing_xi', fixture_id=fixture.id) }}">
+        Set Playing XI
+      </a>
+    </div>
+  {% else %}
+    <form method="post" class="mt-6 space-y-4">
+      <div class="rounded-2xl border border-white/10 bg-white/5 p-4 sm:p-5">
+        <div class="flex items-center justify-between">
+          <div class="text-sm font-semibold">Batting</div>
+          <div class="text-xs text-slate-300">Runs, balls, fours, sixes</div>
+        </div>
+        <div class="mt-4 overflow-x-auto rounded-xl border border-white/10">
+          <table class="min-w-full text-left text-xs sm:text-sm">
+            <thead class="bg-white/5 text-xs uppercase text-slate-300">
+              <tr>
+                <th class="px-3 py-3 sm:px-4">Player</th>
+                <th class="px-3 py-3 sm:px-4">R</th>
+                <th class="px-3 py-3 sm:px-4">B</th>
+                <th class="px-3 py-3 sm:px-4">4s</th>
+                <th class="px-3 py-3 sm:px-4">6s</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-white/10 bg-slate-950/20">
+              {% for p in players %}
+                {% set s = existing.get(p.id) %}
+                <tr class="hover:bg-white/5">
+                  <td class="px-3 py-3 sm:px-4">
+                    <div class="font-semibold">{{ p.name }}</div>
+                    <div class="text-xs text-slate-300">#{{ p.jersey_number }} • {{ p.role_group }}</div>
+                  </td>
+                  <td class="px-3 py-3 sm:px-4"><input class="w-16 sm:w-20 rounded-lg border border-white/10 bg-slate-950/60 px-2 py-1" type="number" name="runs_{{ p.id }}" value="{{ s.runs_scored if s else 0 }}" /></td>
+                  <td class="px-3 py-3 sm:px-4"><input class="w-16 sm:w-20 rounded-lg border border-white/10 bg-slate-950/60 px-2 py-1" type="number" name="balls_{{ p.id }}" value="{{ s.balls_faced if s else 0 }}" /></td>
+                  <td class="px-3 py-3 sm:px-4"><input class="w-16 sm:w-20 rounded-lg border border-white/10 bg-slate-950/60 px-2 py-1" type="number" name="fours_{{ p.id }}" value="{{ s.fours if s else 0 }}" /></td>
+                  <td class="px-3 py-3 sm:px-4"><input class="w-16 sm:w-20 rounded-lg border border-white/10 bg-slate-950/60 px-2 py-1" type="number" name="sixes_{{ p.id }}" value="{{ s.sixes if s else 0 }}" /></td>
+                </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <div class="rounded-2xl border border-white/10 bg-white/5 p-4 sm:p-5">
+        <div class="flex items-center justify-between">
+          <div class="text-sm font-semibold">Bowling</div>
+          <div class="text-xs text-slate-300">Overs, wickets, runs conceded, maidens</div>
+        </div>
+        <div class="mt-4 overflow-x-auto rounded-xl border border-white/10">
+          <table class="min-w-full text-left text-xs sm:text-sm">
+            <thead class="bg-white/5 text-xs uppercase text-slate-300">
+              <tr>
+                <th class="px-3 py-3 sm:px-4">Player</th>
+                <th class="px-3 py-3 sm:px-4">Overs</th>
+                <th class="px-3 py-3 sm:px-4">Wkts</th>
+                <th class="px-3 py-3 sm:px-4">Runs</th>
+                <th class="px-3 py-3 sm:px-4">M</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-white/10 bg-slate-950/20">
+              {% for p in players %}
+                {% set s = existing.get(p.id) %}
+                <tr class="hover:bg-white/5">
+                  <td class="px-3 py-3 sm:px-4">
+                    <div class="font-semibold">{{ p.name }}</div>
+                    <div class="text-xs text-slate-300">#{{ p.jersey_number }} • {{ p.specialty or '—' }}</div>
+                  </td>
+                  <td class="px-3 py-3 sm:px-4"><input class="w-20 sm:w-24 rounded-lg border border-white/10 bg-slate-950/60 px-2 py-1" type="number" step="0.1" name="overs_{{ p.id }}" value="{{ s.overs_bowled if s else 0 }}" /></td>
+                  <td class="px-3 py-3 sm:px-4"><input class="w-16 sm:w-20 rounded-lg border border-white/10 bg-slate-950/60 px-2 py-1" type="number" name="wkts_{{ p.id }}" value="{{ s.wickets_taken if s else 0 }}" /></td>
+                  <td class="px-3 py-3 sm:px-4"><input class="w-16 sm:w-20 rounded-lg border border-white/10 bg-slate-950/60 px-2 py-1" type="number" name="conceded_{{ p.id }}" value="{{ s.runs_conceded if s else 0 }}" /></td>
+                  <td class="px-3 py-3 sm:px-4"><input class="w-16 sm:w-20 rounded-lg border border-white/10 bg-slate-950/60 px-2 py-1" type="number" name="maidens_{{ p.id }}" value="{{ s.maidens if s else 0 }}" /></td>
+                </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <button class="w-full rounded-xl bg-cricket-gold px-4 py-3 text-sm font-semibold text-slate-900 hover:brightness-110" type="submit">
+        Save Scorecard (marks match Completed)
+      </button>
+    </form>
+  {% endif %}
+{% endblock %}
+

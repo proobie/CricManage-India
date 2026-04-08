@@ -1,0 +1,43 @@
+{% extends "base.html" %}
+{% block title %}Fixtures • Admin • CricManage India{% endblock %}
+
+{% block content %}
+  <div class="flex flex-wrap items-end justify-between gap-3">
+    <div>
+      <div class="text-sm font-semibold text-cricket-gold">Fixture Scheduler</div>
+      <h1 class="mt-1 text-3xl font-bold">Match Fixtures</h1>
+      <p class="mt-2 text-sm text-slate-300">Schedule matches with venue, match type, and date/time.</p>
+    </div>
+    <a class="rounded-xl bg-cricket-gold px-4 py-2.5 text-sm font-semibold text-slate-900 hover:brightness-110" href="{{ url_for('admin_fixtures_new') }}">+ New Fixture</a>
+  </div>
+
+  <div class="mt-6 grid gap-4">
+    {% for f in fixtures %}
+      <div class="rounded-2xl border border-white/10 bg-white/5 p-5">
+        <div class="flex flex-wrap items-start justify-between gap-3">
+          <div>
+            <div class="text-lg font-bold">{{ f.opponent_team }}</div>
+            <div class="mt-1 text-sm text-slate-300">
+              {{ f.match_type }} • {{ f.venue }} • {{ f.date_time.strftime('%d %b %Y, %I:%M %p') }}
+            </div>
+            <div class="mt-2 inline-flex items-center gap-2 rounded-full border border-white/10 bg-slate-950/40 px-3 py-1 text-xs">
+              Status: <span class="font-semibold text-cricket-gold">{{ f.match_status }}</span>
+              <span class="text-slate-400">•</span>
+              XI: <span class="font-semibold">{{ f.playing_xi_ids()|length }}/11</span>
+            </div>
+          </div>
+          <div class="flex flex-wrap gap-2">
+            <a class="rounded-xl bg-white/10 px-4 py-2 text-sm hover:bg-white/15" href="{{ url_for('admin_fixtures_edit', fixture_id=f.id) }}">Edit</a>
+            <a class="rounded-xl bg-white/10 px-4 py-2 text-sm hover:bg-white/15" href="{{ url_for('admin_fixture_playing_xi', fixture_id=f.id) }}">Playing XI</a>
+            <a class="rounded-xl bg-white/10 px-4 py-2 text-sm hover:bg-white/15" href="{{ url_for('admin_fixture_scorecard', fixture_id=f.id) }}">Scorecard</a>
+          </div>
+        </div>
+      </div>
+    {% endfor %}
+
+    {% if not fixtures %}
+      <div class="text-sm text-slate-300">No fixtures yet.</div>
+    {% endif %}
+  </div>
+{% endblock %}
+

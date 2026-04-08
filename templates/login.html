@@ -1,0 +1,51 @@
+{% extends "base.html" %}
+{% block title %}Login • CricManage India{% endblock %}
+
+{% block content %}
+  <div class="mx-auto max-w-lg">
+    <div class="rounded-2xl border border-white/10 bg-white/5 p-6">
+      <h1 class="text-2xl font-bold">Login</h1>
+      <p class="mt-1 text-sm text-slate-300">
+        Admins manage squads & fixtures. Players view profile, form, and lineup reminders.
+      </p>
+
+      <form class="mt-6 space-y-4" method="post">
+        <div>
+          <label class="text-sm font-semibold text-slate-200">Username</label>
+          <input
+            name="username"
+            autocomplete="username"
+            class="mt-1 w-full rounded-xl border border-white/10 bg-slate-950/60 px-3 py-2 text-sm outline-none ring-0 focus:border-cricket-gold/60"
+            placeholder="admin"
+            required
+          />
+        </div>
+        <div>
+          <label class="text-sm font-semibold text-slate-200">Password</label>
+          <input
+            type="password"
+            name="password"
+            autocomplete="current-password"
+            class="mt-1 w-full rounded-xl border border-white/10 bg-slate-950/60 px-3 py-2 text-sm outline-none ring-0 focus:border-cricket-gold/60"
+            placeholder="••••••••"
+            required
+          />
+        </div>
+        <button
+          type="submit"
+          class="w-full rounded-xl bg-cricket-gold px-4 py-2.5 text-sm font-semibold text-slate-900 hover:brightness-110"
+        >
+          Sign in
+        </button>
+      </form>
+
+      <div class="mt-6 rounded-xl border border-white/10 bg-white/5 p-4 text-sm text-slate-200">
+        <div class="font-semibold">Demo admin</div>
+        <div class="mt-1 text-slate-300">
+          Username: <span class="font-semibold">admin</span> • Password: <span class="font-semibold">admin123</span>
+        </div>
+      </div>
+    </div>
+  </div>
+{% endblock %}
+

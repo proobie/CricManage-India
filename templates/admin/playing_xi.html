@@ -1,0 +1,74 @@
+{% extends "base.html" %}
+{% block title %}Playing XI • Admin • CricManage India{% endblock %}
+
+{% block content %}
+  <div class="flex flex-wrap items-end justify-between gap-3">
+    <div>
+      <div class="text-sm font-semibold text-cricket-gold">Playing XI Builder</div>
+      <h1 class="mt-1 text-3xl font-bold">{{ fixture.opponent_team }}</h1>
+      <p class="mt-2 text-sm text-slate-300">
+        Select exactly 11 players for the next match. (Digital whiteboard style)
+      </p>
+    </div>
+    <a class="rounded-xl bg-white/10 px-4 py-2.5 text-sm hover:bg-white/15" href="{{ url_for('admin_fixtures') }}">Back</a>
+  </div>
+
+  <form method="post" class="mt-6 grid gap-4 lg:grid-cols-3">
+    <div class="lg:col-span-2 rounded-2xl border border-white/10 bg-white/5 p-4 sm:p-6">
+      <div class="flex items-center justify-between">
+        <div class="text-sm font-semibold">Available Squad</div>
+        <div class="text-xs text-slate-300">Selected: <span id="selectedCount" class="font-semibold">{{ selected_ids|length }}</span>/11</div>
+      </div>
+      <div class="mt-4 grid gap-3 sm:grid-cols-2">
+        {% for p in players %}
+          <label class="flex cursor-pointer items-start gap-3 rounded-xl border border-white/10 bg-slate-950/30 p-3 sm:p-4 hover:bg-white/5">
+            <input
+              class="mt-1 h-4 w-4 accent-[#fbbf24]"
+              type="checkbox"
+              name="playing_xi"
+              value="{{ p.id }}"
+              {% if p.id in selected_ids %}checked{% endif %}
+              onchange="updateCount()"
+            />
+            <div>
+              <div class="font-semibold">{{ p.name }}</div>
+              <div class="text-xs text-slate-300">#{{ p.jersey_number }} • {{ p.role_group }} • {{ p.specialty or '—' }}</div>
+            </div>
+          </label>
+        {% endfor %}
+      </div>
+    </div>
+
+    <div class="rounded-2xl border border-white/10 bg-white/5 p-4 sm:p-6">
+      <div class="text-sm font-semibold">Whiteboard</div>
+      <p class="mt-1 text-sm text-slate-300">Tip: keep a balance of batting depth + bowling options.</p>
+
+      <div class="mt-4 rounded-xl border border-white/10 bg-slate-950/30 p-4">
+        <div class="text-xs uppercase text-slate-400">Match</div>
+        <div class="mt-1 font-semibold">{{ fixture.match_type }} • {{ fixture.venue }}</div>
+        <div class="mt-1 text-sm text-slate-300">{{ fixture.date_time.strftime('%d %b %Y, %I:%M %p') }}</div>
+      </div>
+
+      <button
+        class="mt-4 w-full rounded-xl bg-cricket-gold px-4 py-2.5 text-sm font-semibold text-slate-900 hover:brightness-110"
+        type="submit"
+      >
+        Save Playing XI
+      </button>
+
+      <div class="mt-4 text-xs text-slate-400">
+        Requirement: exactly 11 players must be selected.
+      </div>
+    </div>
+  </form>
+
+  <script>
+    function updateCount() {
+      const checks = document.querySelectorAll('input[name="playing_xi"]:checked');
+      const el = document.getElementById("selectedCount");
+      if (el) el.textContent = String(checks.length);
+    }
+    updateCount();
+  </script>
+{% endblock %}
+
