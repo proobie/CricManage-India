@@ -32,14 +32,14 @@ def create_app() -> Flask:
     # Ensure Flask instance folder exists (default location for SQLite when using relative paths)
     os.makedirs(app.instance_path, exist_ok=True)
 
-    def _ensure_sqlite_parent_dir(sqlalchemy_uri: str) -> None:
+    def _ensure_sqlite_parent_dir(sqlalchemy_uri: str) -> bool:
         # Handles common sqlite URI forms:
         # - sqlite:////absolute/path/file.sqlite3
         # - sqlite:///relative.sqlite3
         if not sqlalchemy_uri.startswith("sqlite:"):
-            return
+            return True
         if sqlalchemy_uri in ("sqlite://", "sqlite:///:memory:", "sqlite:///:memory"):
-            return
+            return True
 
         file_path: str | None = None
         if sqlalchemy_uri.startswith("sqlite:////"):
@@ -49,14 +49,18 @@ def create_app() -> Flask:
             file_path = sqlalchemy_uri.replace("sqlite:///", "", 1)
             if not os.path.isabs(file_path):
                 # relative DB file (Flask/SQLAlchemy will place it under instance by default)
-                return
+                return True
 
         if not file_path:
-            return
+            return True
 
         parent = os.path.dirname(file_path)
         if parent:
-            os.makedirs(parent, exist_ok=True)
+            try:
+                os.makedirs(parent, exist_ok=True)
+            except PermissionError:
+                return False
+        return True
     # Database configuration:
     # - If DATABASE_URL is set (e.g. Postgres), we use it.
     # - Else we default to a local SQLite file under /instance (Flask default).
@@ -72,7 +76,11 @@ def create_app() -> Flask:
             app.config["SQLALCHEMY_DATABASE_URI"] = sqlite_path
         else:
             app.config["SQLALCHEMY_DATABASE_URI"] = f"sqlite:///{sqlite_path}"
-        _ensure_sqlite_parent_dir(app.config["SQLALCHEMY_DATABASE_URI"])
+        ok = _ensure_sqlite_parent_dir(app.config["SQLALCHEMY_DATABASE_URI"])
+        if not ok:
+            # If an absolute sqlite path points to a non-writable directory (common when SQLITE_PATH
+            # is set but the persistent disk is not mounted), fall back to the default local DB.
+            app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///cricmanage.sqlite3"
     app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 
     db.init_app(app)
