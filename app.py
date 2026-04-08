@@ -28,6 +28,35 @@ from models import (
 def create_app() -> Flask:
     app = Flask(__name__)
     app.config["SECRET_KEY"] = os.environ.get("SECRET_KEY", "dev-secret-change-me")
+
+    # Ensure Flask instance folder exists (default location for SQLite when using relative paths)
+    os.makedirs(app.instance_path, exist_ok=True)
+
+    def _ensure_sqlite_parent_dir(sqlalchemy_uri: str) -> None:
+        # Handles common sqlite URI forms:
+        # - sqlite:////absolute/path/file.sqlite3
+        # - sqlite:///relative.sqlite3
+        if not sqlalchemy_uri.startswith("sqlite:"):
+            return
+        if sqlalchemy_uri in ("sqlite://", "sqlite:///:memory:", "sqlite:///:memory"):
+            return
+
+        file_path: str | None = None
+        if sqlalchemy_uri.startswith("sqlite:////"):
+            # absolute Unix path
+            file_path = sqlalchemy_uri.replace("sqlite:////", "/", 1)
+        elif sqlalchemy_uri.startswith("sqlite:///"):
+            file_path = sqlalchemy_uri.replace("sqlite:///", "", 1)
+            if not os.path.isabs(file_path):
+                # relative DB file (Flask/SQLAlchemy will place it under instance by default)
+                return
+
+        if not file_path:
+            return
+
+        parent = os.path.dirname(file_path)
+        if parent:
+            os.makedirs(parent, exist_ok=True)
     # Database configuration:
     # - If DATABASE_URL is set (e.g. Postgres), we use it.
     # - Else we default to a local SQLite file under /instance (Flask default).
@@ -43,6 +72,7 @@ def create_app() -> Flask:
             app.config["SQLALCHEMY_DATABASE_URI"] = sqlite_path
         else:
             app.config["SQLALCHEMY_DATABASE_URI"] = f"sqlite:///{sqlite_path}"
+        _ensure_sqlite_parent_dir(app.config["SQLALCHEMY_DATABASE_URI"])
     app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 
     db.init_app(app)
